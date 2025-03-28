@@ -1,0 +1,70 @@
+body { 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+    margin: 0; 
+    padding: 0; 
+    background-color: #f4f4f4;
+}
+.container { 
+    max-width: 400px; 
+    margin: 50px auto; 
+    padding: 20px; 
+    background: white; 
+    border-radius: 10px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+input, button { 
+    width: 90%; 
+    margin: 10px 0; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px;
+}
+button { 
+    background-color: #28a745; 
+    color: white; 
+    cursor: pointer; 
+    border: none;
+}
+button:hover {
+    background-color: #218838;
+}
+.hidden { display: none; }
+
+/* Tabs for login selection */
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.tabs button {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background: #ddd;
+}
+.tabs button.active {
+    background: #28a745;
+    color: white;
+}
+
+/* Attendance Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+th {
+    background-color: #f8f8f8;
+}
+.present {
+    background-color: lightgreen;
+}
+.absent {
+    background-color: lightcoral;
+}

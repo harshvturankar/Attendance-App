@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            background-color: #0d5cf9;
+        }
+        .container {
+            margin-top: 20px;
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 800px;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+        .input-section {
+            margin-top: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #cccccc;
+        }
+        button {
+            background-color: #6200ea;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Student Attendance Graph</h2>
+        <!-- Input Section -->
+        <div class="input-section">
+            <input type="text" id="subjectInput" placeholder="Enter Subject Name" required>
+            <button onclick="addSubject()">Add Subject</button>
+        </div>
+        <!-- Subject List -->
+        <div id="subjectList"></div>
+        <!-- Graph Section -->
+        <canvas id="attendanceChart" width="600" height="400"></canvas>
+    </div>
+
+    <script>
+        const students = JSON.parse(localStorage.getItem('students')) || []; // Retrieve stored student data
+        const subjects = []; // List of subjects
+        let attendanceChart; // Store Chart.js instance
+
+        // Add a subject and regenerate the graph
+        function addSubject() {
+            const subject = document.getElementById('subjectInput').value; // Subject entered by user
+            
+            if (!subject.trim()) {
+                alert('Please enter a subject name!');
+                return;
+            }
+
+            if (subjects.includes(subject)) {
+                alert('Subject already added!');
+                return;
+            }
+
+            subjects.push(subject); // Add subject to the list
+
+            // Display the added subject with a Delete button
+            const subjectList = document.getElementById('subjectList');
+            const subjectItem = document.createElement('div');
+            subjectItem.innerHTML = `
+                <p>
+                    ${subject} 
+                    <button onclick="deleteSubject('${subject}')">Delete</button>
+                </p>
+            `;
+            subjectList.appendChild(subjectItem);
+
+            // Clear input
+            document.getElementById('subjectInput').value = '';
+
+            // Generate Graph for all Subjects
+            generateGraph();
+        }
+
+        // Delete a subject
+        function deleteSubject(subject) {
+            const subjectIndex = subjects.indexOf(subject);
+            if (subjectIndex !== -1) {
+                subjects.splice(subjectIndex, 1); // Remove subject from the list
+            }
+
+            // Regenerate the subject list display
+            const subjectList = document.getElementById('subjectList');
+            subjectList.innerHTML = ''; // Clear current list
+            subjects.forEach(sub => {
+                const subjectItem = document.createElement('div');
+                subjectItem.innerHTML = `
+                    <p>
+                        ${sub} 
+                        <button onclick="deleteSubject('${sub}')">Delete</button>
+                    </p>
+                `;
+                subjectList.appendChild(subjectItem);
+            });
+
+            // Regenerate the Graph for remaining Subjects
+            generateGraph();
+        }
+
+        // Generate graph with multiple datasets for each subject
+        function generateGraph() {
+            if (attendanceChart) {
+                attendanceChart.destroy(); // Destroy existing chart before creating a new one
+            }
+
+            // Create datasets: each subject gets its own dataset
+            const datasets = subjects.map((subject, index) => {
+                return {
+                    label: `${subject} Attendance (Hours)`,
+                    data: students.map(student => Math.floor(Math.random() * 10) + 1), // Random attendance data
+                    backgroundColor: `rgba(${75 + index * 50}, ${192}, ${192}, 0.6)`,
+                    borderColor: `rgba(${75 + index * 50}, ${192}, ${192}, 1)`,
+                    borderWidth: 1
+                };
+            });
+
+            // Create Chart
+            const ctx = document.getElementById('attendanceChart').getContext('2d');
+            attendanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: students.map(student => student.name), // Student names on X-axis
+                    datasets: datasets // Attendance datasets for all subjects
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Attendance for Students Across Multiple Subjects'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Hours'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Students'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

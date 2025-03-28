@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: #0d5cf9;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #333333;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .image-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #333333;
+            font-size: 18px;
+        }
+        .image-button img {
+            background-color: white;
+            width: 150px;
+            height: 150px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        .image-button img:hover {
+            transform: scale(1.1);
+        }
+        .image-button span {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Portal</h1>
+    <div class="button-container">
+        <!-- Student Button -->
+        <a href="student.html" class="image-button">
+            <img src="image copy 2.png" alt="Student">
+            <span>Student</span>
+        </a>
+        <!-- Teacher/Faculty Button -->
+        <a href="parent.html" class="image-button">
+            <img src="image copy 4.png" style="background-size: cover;" alt="Teacher/Faculty">
+            <span>Teacher/Faculty</span>
+        </a>
+    </div>
+</body>
+</html>

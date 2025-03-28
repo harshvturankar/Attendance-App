@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner & Input Form</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            background-color: #0d5cf9;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            flex-wrap:wrap;
+            justify-content: center;
+            margin-top: 20px;
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px;
+        }
+        #qr-reader {
+            width: 100%;
+            max-width: 400px;
+        }
+        #result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: green;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #cccccc;
+        }
+        button {
+            background-color: #005eff;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: black 0px 1px 6px 0px;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>QR Code Scanner</h2>
+        <div id="qr-reader"></div>
+        <p id="result">Scan your QR code to Mark Attendance</p>
+    </div>
+
+    <div class="container">
+        <h2>Manual Entry (If Scanner Fails)</h2>
+        <input type="text" id="studentName" placeholder="Enter Student Name">
+        <input type="text" id="rollNumber" placeholder="Enter Roll Number">
+        <button onclick="saveManualEntry()">Save Data</button>
+    </div>
+
+    <div class="container">
+        <h2>Download Attendance Reports</h2>
+        <button onclick="generatePDF('Weekly Report')">Download Weekly Report</button>
+        <button onclick="generatePDF('Monthly Report')">Download Monthly Report</button>
+        <button onclick="generatePDF('Live Attendance')">Download Live Attendance</button>
+    </div>
+
+    <script>
+        let timeout;
+        
+        function onScanSuccess(decodedText, decodedResult) {
+            clearTimeout(timeout); // Stop the timeout if QR is scanned
+            document.getElementById('result').innerText = "Scanned QR Code: " + decodedText;
+            
+            let data = decodedText.split("-");
+            if (data.length === 2) {
+                let studentName = data[0].trim();
+                let rollNumber = data[1].trim();
+                saveStudentData(studentName, rollNumber);
+            } else {
+                alert("Invalid QR Code format!");
+            }
+        }
+
+        function onScanFailure(error) {
+            console.warn(`QR scan failed: ${error}`);
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+
+        // Start a timeout of 15 seconds to send WhatsApp alert
+        timeout = setTimeout(() => {
+            alert("QR code not scanned in 15 seconds. Sending WhatsApp alert...");
+            sendWhatsAppAlert();
+        }, 15000);
+
+        function saveManualEntry() {
+            let studentName = document.getElementById('studentName').value.trim();
+            let rollNumber = document.getElementById('rollNumber').value.trim();
+
+            if (studentName && rollNumber) {
+                saveStudentData(studentName, rollNumber);
+                alert("Student details saved!");
+            } else {
+                alert("Please enter both name and roll number.");
+            }
+        }
+
+        function saveStudentData(name, rollNumber) {
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+            students.push({ name, rollNumber });
+            localStorage.setItem("students", JSON.stringify(students));
+        }
+
+        function sendWhatsAppAlert() {
+            fetch("http://localhost:3000/send-whatsapp", { method: "POST" })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error("Error sending WhatsApp message:", error));
+        }
+
+        async function generatePDF(reportType) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text(reportType, 20, 20);
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(12);
+            doc.text("Student Attendance Data", 20, 30);
+
+            let y = 40;
+            students.forEach((student, index) => {
+                doc.text(`${index + 1}. ${student.name} - ${student.rollNumber}`, 20, y);
+                y += 10;
+            });
+
+            doc.save(`${reportType}.pdf`);
+        }
+    </script>
+</body>
+</html>

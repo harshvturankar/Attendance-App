@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Attendance Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            background-color: #0d5cf9;
+            color: white;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 80%;
+            color: black;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #005eff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: black 0px 1px 6px 0px;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Download Attendance Reports</h2>
+        <p>Click the button below to download the latest attendance report.</p>
+        <a id="downloadLink" href="#" download>
+            <button>Download Latest Report</button>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let storedPdf = localStorage.getItem("latestAttendanceReport");
+            if (storedPdf) {
+                document.getElementById("downloadLink").href = storedPdf;
+            } else {
+                document.getElementById("downloadLink").textContent = "No Report Available";
+                document.getElementById("downloadLink").style.pointerEvents = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>
